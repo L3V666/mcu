@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 
 
 def read_value(ser):
-	while True:
-		try:
-			line = ser.readline().decode('ascii')
-			v, t = map(float, line.split())
-			return v, t
-		except ValueError:
-			continue
+    while True:
+        try:
+            line = ser.readline().decode('ascii').strip()
+            v, t = map(float, line.split())
+            return v, t
+        except (ValueError, UnicodeDecodeError):
+            continue
 
 def main():
     ser = serial.Serial(port='/dev/ttyACM6', baudrate=115200, timeout=0.0)
@@ -26,10 +26,11 @@ def main():
     measures_ts = []
     
     start_ts = time.time()
-
-    ser.write("tm_start\n".encode('ascii'))
     
     try:
+        ser.write("tm_start\n".encode('ascii'))
+        print("Telemetry started")
+
         while True:
             ts = time.time() - start_ts
             
@@ -47,6 +48,8 @@ def main():
         print("\nMeasurement stopped by user")
     finally:
         ser.write("tm_stop\n".encode('ascii'))
+        print("Telemetry stopped")
+
         ser.close()
         print("Port closed")
         

@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "bme280-driver.h"
 #include "hardware/i2c.h"
+#include "stdlib.h"
 
 #define DEVICE_NAME "my-pico-device"
 #define DEVICE_VRSN "v0.0.1"
@@ -37,11 +38,9 @@ void led_blink_callback(const char *args)
 
 void read_reg_callback(const char *args)
 {
-    unsigned int addr, N;
+    unsigned int addr = 0, N = 0;
 
-    sscanf(args, "%x %u", &addr, &N);
-
-    printf("Получены: addr = 0x%02X, N = %d\n", addr, N);
+    sscanf(args, "%x %x", &addr, &N);
 
     uint8_t buffer[256] = {0};
     bme280_read_regs(addr, buffer, N);
@@ -58,13 +57,50 @@ void read_reg_callback(const char *args)
     }
 }
 
+void write_reg_callback(const char *args)
+{
+    unsigned int addr = 0, N = 0;
+
+    sscanf(args, "%x %x", &addr, &N);
+
+    if (addr > 0xFF && N > 0xFF && addr + N > 0x100)
+    {
+        printf("Error read_reg\n");
+        return;
+    }
+
+    bme280_write_reg(addr, N);
+}
+
+void temp_raw_callback(const char *args)
+{
+    uint16_t raw = bme280_read_temp_raw();
+    printf("temp_raw: %u (0x%04X)\n", raw, raw);
+}
+
+void pres_raw_callback(const char *args)
+{
+    uint16_t raw = bme280_read_pres_raw();
+    printf("pres_raw: %u (0x%04X)\n", raw, raw);
+}
+
+void hum_raw_callback(const char *args)
+{
+    uint16_t raw = bme280_read_hum_raw();
+    printf("hum_raw: %u (0x%04X)\n", raw, raw);
+}
+
 api_t device_api[] =
     {
         {"version", version_callback, "get device name and firmware version"},
         {"on", led_on_callback, "led on"},
         {"off", led_off_callback, "led off"},
         {"blink", led_blink_callback, "led blink"},
-        {"read_reg", read_reg_callback, "read_reg"},
+        {"read_reg", read_reg_callback, "read reg"},
+        {"write_reg", write_reg_callback, "write reg"},
+        {"temp_raw", temp_raw_callback, "temp raw"},
+        {"pres_raw", pres_raw_callback, "pres raw"},
+        {"hum_raw", hum_raw_callback, "hum raw"},
         {NULL, NULL, NULL},
 };
 

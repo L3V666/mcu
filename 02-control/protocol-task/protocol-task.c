@@ -10,7 +10,10 @@ void protocol_task_init(api_t *device_api);
 void protocol_task_init(api_t *device_api)
 {
     api = device_api;
-    commands_count = sizeof(device_api);
+    while (device_api[commands_count].command_name != NULL)
+    {
+        commands_count++;
+    }
 }
 
 void protocol_task_handle(char *command_string)

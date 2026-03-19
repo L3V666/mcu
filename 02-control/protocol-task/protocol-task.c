@@ -17,7 +17,6 @@ void protocol_task_init(api_t *device_api)
 }
 
 void protocol_task_handle(char *command_string)
-
 {
 
     //	Добавляем в обработчик проверку на то, что `command_string` не равно `NULL`.

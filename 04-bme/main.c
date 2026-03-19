@@ -90,6 +90,21 @@ void hum_raw_callback(const char *args)
     printf("hum_raw: %u (0x%04X)\n", raw, raw);
 }
 
+void temp_callback(const char* args) {
+    float temp = bme280_read_temperature();
+    printf("%.2f °C\n", temp);
+}
+
+void pres_callback(const char* args) {
+    float pres = bme280_read_pressure();
+    printf("%.2f Pa\n", pres);
+}
+
+void hum_callback(const char* args) {
+    float hum = bme280_read_humidity();
+    printf("%.2f %%\n", hum);
+}
+
 api_t device_api[] =
     {
         {"version", version_callback, "get device name and firmware version"},
@@ -101,6 +116,9 @@ api_t device_api[] =
         {"temp_raw", temp_raw_callback, "temp raw"},
         {"pres_raw", pres_raw_callback, "pres raw"},
         {"hum_raw", hum_raw_callback, "hum raw"},
+        {"temp", temp_callback, "temperature in °C"},
+        {"pres", pres_callback, "pressure in hPa"},
+        {"hum", hum_callback, "humidity in %"},
         {NULL, NULL, NULL},
 };
 

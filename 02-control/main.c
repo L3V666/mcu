@@ -48,16 +48,7 @@ void led_blink_set_period_ms_callback(const char *args)
     printf("LED blink period set to %u ms\n", period_ms);
 }
 
-void help_callback(const char *args)
-{
-    printf("\nAvailable commands:\n");
-
-    for (int i = 0; device_api[i].command_name != NULL; i++)
-    {
-        printf("  %-20s - %s\n", device_api[i].command_name, device_api[i].command_help);
-    }
-    printf("\n");
-}
+void help_callback(const char *args);
 
 void mem_callback(const char *args)
 {
@@ -94,16 +85,28 @@ void wmem_callback(const char *args)
 
 api_t device_api[] =
     {
+        {"help", help_callback, "help"},
         {"version", version_callback, "get device name and firmware version"},
         {"on", led_on_callback, "led on"},
         {"off", led_off_callback, "led off"},
         {"blink", led_blink_callback, "led blink"},
         {"set_period", led_blink_set_period_ms_callback, "set period"},
-        {"help", help_callback, "help"},
+
         {"mem", mem_callback, "read memory at address"},
         {"wmem", wmem_callback, "write memory at address"},
         {NULL, NULL, NULL},
 };
+
+void help_callback(const char *args)
+{
+    printf("\nAvailable commands:\n");
+
+    for (int i = 0; device_api[i].command_name != NULL; i++)
+    {
+        printf("  %-20s - %s\n", device_api[i].command_name, device_api[i].command_help);
+    }
+    printf("\n");
+}
 
 int main()
 {

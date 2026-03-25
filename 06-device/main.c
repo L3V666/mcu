@@ -265,7 +265,118 @@ void rp2040_i2c_write(uint8_t *data, uint16_t size)
 void draw_temp_colum(float temp)
 {
     uint16_t color;
-    
+    int n;
+    if (temp < 20)
+    {
+        color = RGB888_2_RGB565(0x0000FF);
+        n = 1;
+    }
+    else if (20 <= temp && temp < 22)
+    {
+        color = RGB888_2_RGB565(0x00FFFF);
+        n = 2;
+    }
+    else if (22 <= temp && temp <= 24)
+    {
+        color = RGB888_2_RGB565(0x00FF00);
+        n = 3;
+    }
+    else if (24 < temp && temp <= 26)
+    {
+        color = RGB888_2_RGB565(0xFFA500);
+        n = 4;
+    }
+    else if (26 < temp)
+    {
+        color = RGB888_2_RGB565(0xFF0000);
+        n = 5;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        ili9341_draw_filled_rect(&ili9341_display, 10, 200 - i * 40, 80, 30, color);
+    }
+    for (int i = n; i < 5; i++)
+    {
+        ili9341_draw_filled_rect(&ili9341_display, 0, 200 - i * 40, 100, 30, COLOR_BLACK);
+    }
+}
+
+void draw_pres_colum(float pres)
+{
+    uint16_t color;
+    int n;
+    if (pres < 9730)
+    {
+        color = RGB888_2_RGB565(0x0000FF);
+        n = 1;
+    }
+    else if (9730 <= pres && pres < 9995)
+    {
+        color = RGB888_2_RGB565(0x00FFFF);
+        n = 2;
+    }
+    else if (9995 <= pres && pres <= 10270)
+    {
+        color = RGB888_2_RGB565(0x00FF00);
+        n = 3;
+    }
+    else if (10270 < pres && pres <= 10530)
+    {
+        color = RGB888_2_RGB565(0xFFA500);
+        n = 4;
+    }
+    else if (10530 < pres)
+    {
+        color = RGB888_2_RGB565(0xFF0000);
+        n = 5;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        ili9341_draw_filled_rect(&ili9341_display, 110, 200 - i * 40, 120, 30, color);
+    }
+    for (int i = n; i < 5; i++)
+    {
+        ili9341_draw_filled_rect(&ili9341_display, 100, 200 - i * 40, 140, 30, COLOR_BLACK);
+    }
+}
+
+void draw_hum_colum(float hum)
+{
+    uint16_t color;
+    int n;
+    if (hum < 30)
+    {
+        color = RGB888_2_RGB565(0x0000FF);
+        n = 1;
+    }
+    else if (30 <= hum && hum < 40)
+    {
+        color = RGB888_2_RGB565(0x00FFFF);
+        n = 2;
+    }
+    else if (40 <= hum && hum <= 60)
+    {
+        color = RGB888_2_RGB565(0x00FF00);
+        n = 3;
+    }
+    else if (60 < hum && hum <= 70)
+    {
+        color = RGB888_2_RGB565(0xFFA500);
+        n = 4;
+    }
+    else if (70 < hum)
+    {
+        color = RGB888_2_RGB565(0xFF0000);
+        n = 5;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        ili9341_draw_filled_rect(&ili9341_display, 250, 200 - i * 40, 120, 30, color);
+    }
+    for (int i = n; i < 5; i++)
+    {
+        ili9341_draw_filled_rect(&ili9341_display, 240, 200 - i * 40, 140, 30, COLOR_BLACK);
+    }
 }
 
 int main()
@@ -303,25 +414,26 @@ int main()
 
         float temp = bme280_read_temperature();
 
-        float pres = bme280_read_pressure();
+        float pres = bme280_read_pressure() / 10;
 
         float hum = bme280_read_humidity();
         // SET TEMP
         char temp_buffer[32];
         sprintf(temp_buffer, "%.2f", temp);
         ili9341_draw_text(&ili9341_display, 60, 0, temp_buffer, &jetbrains_font, COLOR_WHITE, COLOR_BLACK);
-
-        draw_temp_col(temp);
+        draw_temp_colum(temp);
 
         // SET PRES
         char pres_buffer[32];
         sprintf(pres_buffer, "%.2f", pres);
         ili9341_draw_text(&ili9341_display, 180, 0, pres_buffer, &jetbrains_font, COLOR_WHITE, COLOR_BLACK);
+        draw_pres_colum(pres);
 
         // SET HUM
         char hum_buffer[32];
         sprintf(hum_buffer, "%.2f", hum);
-        ili9341_draw_text(&ili9341_display, 285, 0, hum_buffer, &jetbrains_font, COLOR_WHITE, COLOR_BLACK);
+        ili9341_draw_text(&ili9341_display, 290, 0, hum_buffer, &jetbrains_font, COLOR_WHITE, COLOR_BLACK);
+        draw_hum_colum(hum);
 
         sleep_ms(500);
 
